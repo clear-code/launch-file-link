@@ -12,6 +12,9 @@ var bundle = require('lib/locale')
 var lastState = new WeakMap();
 
 function handleLinkClick(aEvent) {
+  if (aEvent.button != 0)
+    return true;
+
   var target = aEvent.originalTarget;
   while (target && !target.href) {
     target = target.parentNode;
