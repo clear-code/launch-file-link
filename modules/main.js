@@ -16,11 +16,21 @@ function handleLinkClick(aEvent) {
   if (url.indexOf('file:') != 0)
     return true;
 
-  target.ownerDocument.defaultView.alert(url);
-
-  aEvent.stopPropagation();
-  aEvent.preventDefault();
-  return false;
+  var IOService = Cc['@mozilla.org/network/io-service;1']
+                    .getService(Ci.nsIIOService);
+  var FileHandler = IOService.getProtocolHandler('file')
+                      .QueryInterface(Ci.nsIFileProtocolHandler);
+  try {
+    var file = FileHandler.getFileFromURLSpec(url);
+    file.QueryInterface(Ci.nsILocalFile).launch();
+    aEvent.stopPropagation();
+    aEvent.preventDefault();
+    return false;
+  }
+  catch(aError) {
+    Cu.reportError(new Error('failed to open a file URL <' + url + '>\n' + aError.message));
+    return true;
+  }
 }
 
 function handleWindow(aWindow)
